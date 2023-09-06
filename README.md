@@ -221,6 +221,7 @@ $ pip install -r requirements.txt
 Run the server.
 
 ```
+$ python3.9 manage.py migrate
 $ python3.9 manage.py runserver 0.0.0.0:8000
 ```
 
@@ -252,7 +253,7 @@ Keep the shell process alive to keep it on, or you might consider use `screen` t
 Now, go to `http://<your ip>:3000` to see the website. You can sign up users there and login in to do transactions.
 
 ## Usage
-The current project is kind of buggy and isn't designed when considering security.
+The current project is kind of buggy and isn't designed while considering security.
 
 Therefore, as mentioned before, **please do not use this in production purposes.** The only purpose to use this is experiments and development.
 
@@ -263,7 +264,9 @@ The following is the improvements you may consider to contribute.
 
 * Dockerize the frontend and backend
 
-* Debug the frontend and backend
+* Debug
+
+* Make the whole thing secure
 
 * Add hyperledger explorer
 
