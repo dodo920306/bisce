@@ -1,0 +1,74 @@
+.headerContainer {
+    width: 100%;
+    height: 65px;
+    margin: 0;
+    padding: 0;
+    background-color: white;
+    border-bottom: #13CC79 2px solid;
+}
+.headerContainer ul {
+    list-style-type: none;
+    padding: 0px 40px 0px 40px;
+}
+.headerContainer ul li {
+    display: inline-block;
+    line-height: 60px;
+    font-family: 'open sans';
+}
+#navLogo {
+    float: left;
+    vertical-align: middle;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0px 0px;
+}
+#navLogo img {
+    height: 65%;
+    margin: 0px 8px;
+}
+#navHome {
+    float: left;
+    margin: 0px 8px;
+}
+
+/* #navTransfer {
+    margin: 0px 8px;
+} */
+
+#navLogin {
+    display: inline;
+    float: right;
+    text-align: right;
+    width: 300px;
+}
+.headerContainer .navLink {
+    color: black;
+    text-decoration: none;
+    font-size: 16px;
+}
+.headerContainer:hover .navLink:hover {
+    /* color: #6ECCAF; */
+    color: #13CC79;
+}
+#welcomeMsg{
+    font-size: 16px;
+    margin: 0px 8px;
+}
+
+#logoutButton {
+    height: 30px;
+    line-height: 20px;
+    font-size: 16px;
+    border: none;
+    margin: 0px 8px;
+    /* border: 2px solid #E7e7e7;
+    border-radius: 20px; */
+    background-color: transparent;
+    font-family: 'open sans';
+}
+
+#logoutButton:hover {
+    cursor: pointer;
+    color: #13CC79;
+}

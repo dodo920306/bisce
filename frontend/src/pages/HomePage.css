@@ -1,0 +1,164 @@
+.homeContainer {
+    height: 100%;
+    padding: 50px;
+    background-color: #ededed;
+}
+.dashContainer {
+    height: 150px;
+    margin: auto;
+    padding: 15px;
+    text-align: center;
+}
+.dashContainer div{
+    margin: 0px 30px;
+}
+.tokenContainer {
+    height: 100%;
+    font-family: 'Open Sans';
+    display: inline-block;
+    vertical-align: top;
+    text-align: left;
+}
+.supplyContainer {
+    height: 100%;
+    display: inline-block;
+    vertical-align: top;
+    font-family: 'Open Sans';
+    text-align: left;
+}
+.idContainer {
+    height: 100%;
+    display: inline-block;
+    vertical-align: top;
+    font-family: 'Open Sans';
+    text-align: left;
+    position: relative;
+}
+.transactionsContainer {
+    height: min-content;
+    border-radius: 20px;
+    padding: 20px;
+    background-color: white;
+}
+#balanceTitle {
+    height: min-content;
+    font-weight: 600;
+    font-size: 18px;
+}
+#tokenNumber {
+    height: 70px;
+    line-height: 70px;
+    font-size: 60px;
+}
+
+#tokenUnit {
+    height: 20px;
+    line-height: 20px;
+    font-size: 16px;
+}
+#supplyTitle {
+    height: min-content;
+    font-weight: 600;
+    color: #8a8a8a;
+    font-size: 18px;
+}
+#supplyDisplay {
+    font-size: 20px;
+    line-height: 30px;
+    height: min-content;
+    color: #8a8a8a;
+}
+#idTitle {
+    height: min-content;
+    font-weight: 600;
+    color: #8a8a8a;
+    font-size: 18px;
+}
+#idDisplay {
+    display: inline-block;
+    font-size: 20px;
+    line-height: 30px;
+    height: min-content;
+    color: #8a8a8a;
+}
+#copyButton {
+    background-color: transparent;
+    border: none;
+    margin-left: 5px;
+    height: min-content;
+    border-radius: 10px;
+    color: #8a8a8a;
+}
+#copyButton:hover {
+    cursor: pointer;
+    color: #6ECCAF;
+}
+#copyButton i{
+    font-size: 20px;
+}
+.tipCopy {
+    z-index: 10;
+    display:none;
+    position:absolute;
+    background-color: #6ECCAF;
+    height: min-content;
+    font-size: 13px;
+    font-family: 'Open Sans';
+    right: -60px;
+    padding: 5px;
+    border-radius: 5px;
+}
+#copyButton:hover + .tipCopy{
+    display: block;
+}
+#txTitle {
+    height: 60px;
+    line-height: 60px;
+    font-family: 'Open Sans';
+    font-size: 20px;
+    font-weight: 600;
+}
+.transactionsContainer li {
+    list-style: none;
+    display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+    font-family: 'Open Sans';
+    height: 30px;
+    line-height: 30px;
+    font-size: 14px;
+    color: #8a8a8a;
+ 
+}
+.colTitle {
+    font-weight: 600;
+    padding: 0px 10px;
+
+}
+.transactionsContainer li span {
+    flex: 1 0;
+}
+#loadingIcon {
+    margin: 20px 0px;
+    height: min-content;
+    width: 100%;
+    text-align: center;
+}
+#loadingIcon i{
+    color: #8a8a8a;
+}
+#showAll {
+    border: none;
+    width: 75px;
+    height: min-content;
+    margin: auto;
+    font-family: 'open sans';
+    background-color: transparent;
+    color:#8a8a8a;
+    font-size: 14px;
+    text-decoration: underline;
+}
+#showAll:hover {
+    color: #6ECCAF;
+    cursor: pointer;
+}

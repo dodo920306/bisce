@@ -1,0 +1,83 @@
+.signupContainer {
+    height: 100%;
+    background-color: white;
+    padding: 50px 100px;
+}
+.signupContainer form {
+    height: 30px;
+}
+.sformContainer {
+    height: 500px;
+    width: 300px;
+    margin: auto;
+    padding: 30px;
+    text-align: center;
+    background-color: #e7e7e7;
+    border-radius: 10px;
+    font-family: 'Open Sans';
+}
+.sformContainer input {
+    display: block;
+    width: 100%;
+}
+
+.sformContainer select {
+    display: block;
+    width: 100%;
+}
+
+.sformContainer .textInput {
+    margin-bottom: 20px;
+    border: none;
+    outline-color: #6ECCAF;
+    border-radius: 3px;
+    padding: 5px;
+}
+.sformContainer .textInput:focus {
+    border: none;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 3px;
+    padding: 5px;
+}
+.sformContainer p {
+    height: 70px;
+    line-height: 70px;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.sformContainer label {
+    display: block;
+    height: 20px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+#createButton {
+    font-size: 14px;
+    margin-top: 20px;
+    background-color: white;
+    border-radius: 15px;
+    border: none;
+}
+
+#createButton:hover {
+    background-color: #6ECCAF;
+    cursor: pointer;
+}
+
+#createButton:disabled {
+    background-color: #8a8a8a;;
+    cursor: pointer;
+}
+
+#errorMsg {
+    color: rgb(255, 86, 86);
+    font-size: 12px;
+    height: 20px;
+    line-height: 20px;
+    font-weight: normal;
+}

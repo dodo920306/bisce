@@ -1,0 +1,108 @@
+.loginContainer {
+    height: 100%;
+    background-color: white;
+    padding: 50px 100px;
+}
+.loginContainer form {
+    height: min-content;
+}
+.formContainer {
+    height: 470px;
+    width: 300px;
+    margin: auto;
+    padding: 30px;
+    text-align: center;
+    background-color: #e7e7e7;
+    border-radius: 10px;
+    font-family: 'Open Sans';
+}
+.formContainer input {
+    display: block;
+    width: 100%;
+}
+
+.formContainer select {
+    display: block;
+    width: 100%;
+}
+
+.formContainer .textInput {
+    margin-bottom: 20px;
+    border: none;
+    outline-color: #6ECCAF;
+    border-radius: 3px;
+    padding: 5px;
+}
+.formContainer .textInput:focus {
+    border: none;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 3px;
+    padding: 5px;
+}
+.formContainer p {
+    height: 70px;
+    line-height: 70px;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.formContainer label {
+    display: block;
+    height: 20px;
+    text-align: left;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+#submitButton {
+    font-size: 14px;
+    margin-top: 40px;
+    height: 30px;
+    background-color: white;
+    border-radius: 15px;
+    border: none;
+}
+
+#submitButton:hover {
+    background-color: #6ECCAF;
+    cursor: pointer;
+}
+
+#signupLink {
+    display: block;
+    font-size: 14px;
+    color: #8a8a8a;
+    font-weight: normal;
+    max-height: 30px;
+    line-height: 35px;
+}
+
+#signupLink a:visited{
+    color: #8a8a8a;
+}
+#githubLink {
+    height: min-content;
+    height: 14px;
+    color: #8a8a8a;
+    font-size: 14px;
+}
+#github{
+    height: 14px;
+    color: #8a8a8a;
+    text-decoration: underline;
+    background-color: transparent;
+    border: none;
+}
+#github:hover {
+    color: #6ECCAF;
+    text-decoration: underline;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+}
+#socialLink {
+    color: #8a8a8a;
+    font-size: 14px;
+}

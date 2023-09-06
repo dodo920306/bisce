@@ -1,0 +1,140 @@
+.transferContainer {
+    height: 100%;
+    padding: 30px 50px;
+}
+.functionsContainer {
+    height: min-content;
+    max-width: 1000px;
+    margin: auto;
+    padding-bottom: 50px;
+}
+.funcCat{
+    display: inline;
+    font-family: 'open sans';
+    font-size: 16px;
+    margin: 0px 10px;
+}
+.funcDropContainer {
+    height: min-content;
+    background-color: #e7e7e7;
+    border-radius: 20px;
+    padding: 20px;
+    margin: 30px;
+    transition: transform .2s;
+}
+.funcDropContainer:hover{
+    transform: scale(1.05);
+    cursor: pointer;
+}
+.funcItemContainer {
+    /* display: flex; */
+    text-align: center;
+    /* height: 200px; */
+    margin: 10px 0px;
+}
+/* icons */
+.funcItemContainer i{
+    height: 150px;
+    line-height: 150px;
+    font-size: 100px;
+    color: #8a8a8a;
+}
+.funcItemContainer p{
+    height: min-content;
+}
+#tokenNumber {
+    height: 70px;
+    line-height: 70px;
+    font-size: 60px;
+}
+
+#tokenUnit {
+    height: 20px;
+    line-height: 20px;
+    font-size: 16px;
+}
+.funcItemContainer p {
+    line-height: 40px;
+    font-family: 'open sans';
+    font-size: 14px;
+    color: #8a8a8a;
+}
+.funcItemContainer button {
+    width: 100px;
+    min-width: 100px;
+    border: none;
+    border-radius: 10px;
+    margin: 0px 10px;
+    font-family: 'open sans';
+    background-color: #e7e7e7;
+}
+
+.funcItemContainer button:hover {
+    background-color: #6ECCAF;
+}
+
+.functionsContainer input {
+    flex-grow: 1;
+    margin: 0px 10px;
+    font-family: 'open sans';
+    border: 2px solid #e7e7e7;
+    border-radius: 10px;
+    background-color: white;
+    padding-left: 10px;
+}
+
+.funcItemContainer input:focus {
+    outline-color: #6ECCAF;
+}
+
+.infoContainer {
+    font-family: 'open sans';
+    height: min-content;
+}
+.infoItemContainer {
+    display: flex;
+    height: 40px;
+    margin: 20px 0px;
+}
+.infoItemContainer input:focus {
+    outline-color: #6ECCAF;
+}
+.infoItemContainer button{
+    width: 100px;
+    min-width: 100px;
+    /* border: 1.5px solid #8a8a8a; */
+    border: none;
+    border-radius: 10px;
+    margin: auto;
+    font-family: 'open sans';
+    background-color: white;
+}
+.infoItemContainer button:hover{
+    border: 2px solid #6ECCAF;
+    background-color: #6ECCAF;
+}
+
+.singleInfoContainer {
+    font-family: 'open sans';
+    padding: 0px 10px;
+    color: #8a8a8a;
+    height: min-content;
+    font-size: 14px;
+}
+.resultContainer {
+    height: min-content;
+    text-align: center;
+    margin: auto;
+    font-family: 'open sans';
+    line-height: 40px;
+    font-size: 14px;
+    color: #8a8a8a;
+}
+
+#clientID {
+    overflow: hidden;
+    word-wrap: break-word; /* only works with hidden */
+
+    font-size: 12px;
+
+}

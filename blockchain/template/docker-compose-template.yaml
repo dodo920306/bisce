@@ -1,0 +1,66 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '3.7'
+
+networks:
+  bisce-network:
+    external: true
+
+volumes:
+  orderer0:
+    external: true
+  peer0:
+    external: true
+
+services:
+  orderer0.${HOST}:
+    container_name: orderer0.${HOST}
+    image: hyperledger/fabric-orderer:latest
+    env_file:
+      - .env.orderer
+    volumes:
+        - ./orderers/orderer0/msp:/var/hyperledger/orderer/msp
+        - ./orderers/orderer0/tls:/var/hyperledger/orderer/tls
+        - orderer0:/var/hyperledger/production/orderer
+    working_dir: /root
+    command: orderer
+    ports:
+      - 7050:7050
+      - 7053:7053
+      - 9443:9443
+    networks:
+      - bisce-network
+
+  couchdb0.${HOST}:
+    container_name: couchdb0.${HOST}
+    image: couchdb:3.3.2
+    env_file:
+      - .env.couchdb
+    ports:
+      - "5984:5984"
+    networks:
+      - bisce-network
+
+  peer0.${HOST}:
+    container_name: peer0.${HOST}
+    image: hyperledger/fabric-peer:latest
+    labels:
+      service: hyperledger-fabric
+    env_file:
+      - .env.peer
+    volumes:
+        - .:/etc/hyperledger
+        - peer0:/var/hyperledger/production
+        - /var/run/docker.sock:/host/var/run/docker.sock
+    working_dir: /root
+    command: peer node start
+    ports:
+      - 7051:7051
+      - 9444:9444
+    depends_on:
+      - couchdb0.${HOST}
+    networks:
+      - bisce-network

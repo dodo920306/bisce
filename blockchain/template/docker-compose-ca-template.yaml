@@ -1,0 +1,26 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '3.7'
+
+networks:
+  bisce-network:
+    external: true
+
+services:
+
+  ca0.${HOST}:
+    container_name: ca0.${HOST}
+    image: hyperledger/fabric-ca:latest
+    env_file:
+      - ./.env.ca
+    ports:
+      - "7054:7054"
+      - "17054:17054"
+    command: sh -c 'fabric-ca-server start -b caadmin:caadminpw -d'
+    volumes:
+      - ./fabric-ca:/etc/hyperledger/fabric-ca-server
+    networks:
+      - bisce-network
