@@ -30,7 +30,7 @@ The only environment used in experiments is Ubuntu 20.04. Any problem caused by 
 
 * jq
 
-    You can install all of this by the following comments in ubuntu:
+    You can install all of these by the following comments in ubuntu:
 
     ```bash
     $ sudo apt-get update
