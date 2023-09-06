@@ -239,7 +239,7 @@ $ cd ../frontend
 Install the requirements.
 
 ```bash
-$ npm install
+$ npm install --force
 ```
 
 Run the webpage.
