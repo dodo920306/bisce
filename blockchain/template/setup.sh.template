@@ -67,38 +67,6 @@ fabric-ca-client register --caname ca-${ORG} --id.name admin --id.secret adminpw
 fabric-ca-client enroll -u https://admin:adminpw@localhost:7054 --caname ca-${ORG} -M "${PWD}/users/admin/msp" --tls.certfiles "${PWD}/fabric-ca/ca-cert.pem"
 cp "${PWD}/msp/config.yaml" "${PWD}/users/admin/msp/config.yaml"
 
-# function one_line_pem {
-#     echo "`awk 'NF {sub(/\\n/, ""); printf "%s\\\\\\\n",$0;}' $1`"
-# }
-
-# function json_ccp {
-#     local PP=$(one_line_pem $4)
-#     local CP=$(one_line_pem $5)
-#     sed -e "s/\${ORG}/$1/" \
-#         -e "s/\${P0PORT}/$2/" \
-#         -e "s/\${CAPORT}/$3/" \
-#         -e "s#\${PEERPEM}#$PP#" \
-#         -e "s#\${CAPEM}#$CP#" \
-#         template/ccp-template.json
-# }
-
-# function yaml_ccp {
-#     local PP=$(one_line_pem $4)
-#     local CP=$(one_line_pem $5)
-#     sed -e "s/\${ORG}/$1/" \
-#         -e "s/\${P0PORT}/$2/" \
-#         -e "s/\${CAPORT}/$3/" \
-#         -e "s#\${PEERPEM}#$PP#" \
-#         -e "s#\${CAPEM}#$CP#" \
-#         template/ccp-template.yaml | sed -e $'s/\\\\n/\\\n          /g'
-# }
-
-# PEERPEM="tlsca/tlsca-cert.pem"
-# CAPEM="ca/ca-cert.pem"
-
-# echo "$(json_ccp $ORG 7051 7054 $PEERPEM $CAPEM)" > "connection.json"
-# echo "$(yaml_ccp $ORG 7051 7054 $PEERPEM $CAPEM)" > "connection.yaml"
-
 printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
 sudo docker-compose -f docker-compose.yaml up -d
