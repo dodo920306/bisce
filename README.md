@@ -136,7 +136,13 @@ If you're a creater, run
 $ ./createChannel.sh
 ```
 
-After that, you may see a tarball called `deliver.tar.gz`, that will be the file you need to give to joiners.
+After that, you may see a tarball called `deliver.tar.gz`, that will be the file you need to give to a joiner.
+
+Please note that this tarball can only be used once. If you give it to two joiners, the later one will fail to join the channel.
+
+The preferred way to invite third organization into the channel is use the second member's deliver directory as a tarball after it joined the channel.
+
+The preferred way to invite forth organization into the channel is use the third member's deliver directory as a tarball after it joined the channel...and so on.
 
 As a joiner, once you get `deliver.tar.gz`, you should place it under your `BISCE/blockchain`.
 
@@ -179,6 +185,15 @@ $ ./joinChannel.sh
 ```
 
 under the deliver diretory to let themselves in.
+
+After that, you can use
+
+```bash
+$ cd ..
+$ tar -zcvf deliver.tar.gz deliver
+```
+
+to make a tarball under `BISCE/blockchain` that you can deliver to next member who wants to join the channel. The original `deliver.tar.gz` won't make it because the config block in it isn't latest any more.
 
 #### The chaincode
 
