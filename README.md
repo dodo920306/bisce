@@ -170,7 +170,7 @@ to sign for the config, and use
 $ sudo docker exec -e CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/users/admin/msp $(sudo docker ps --filter "name=^peer0.*" --format "{{.Names}}") peer channel update -f /etc/hyperledger/update_in_envelope.pb -c biscechannel1 -o $(sudo docker ps --filter "name=^orderer0.*" --format "{{.Names}}"):7050 --tls --cafile /etc/hyperledger/peers/peer0/tls/ca.crt
 ```
 
-to update the channel to include the joinners once most of members in the channel has signed for it.
+to update the channel to include the joinners once you're sure that more than half of members in the channel has signed for it.
 
 Once the joiners are sure that they are in the channel, run
 
@@ -182,7 +182,11 @@ under the deliver diretory to let themselves in.
 
 #### The chaincode
 
-As you can see there's a directory named `chaincode` under the blockchain directory. The chaincode inside will be installed when `createChannel.sh` or `joinChannel.sh` are executed for channel creaters and joiners respectively. Nevertheless, the content inside the chaincode does not matter to the set up process, so you can change it as you like if you want to. However, the website set up later is specifically designed for the original chaincode, so once you change the content you should not use the website here anymore.
+As you can see there's a directory named `chaincode` under the blockchain directory. The chaincode inside will be installed when `createChannel.sh` or `joinChannel.sh` are executed for channel creaters and joiners respectively. Nevertheless, the content inside the chaincode does not matter to the set up process, so you can change it as you like if you want to. However, the website set up later is specifically designed for the original chaincode, so once you change the content you should not use the website here anymore. Also, please remember to change every chaincode content of all members that is/will be in the channel once you change one. If a member's chaincode content is different from others', some conflicts might happen.
+
+The chaincode here was designed while consulting [ERC-20](https://github.com/hyperledger/fabric-samples/tree/main/token-erc-20), [ERC-1155](https://github.com/hyperledger/fabric-samples/tree/main/token-erc-1155), and [High-Throughput Network](https://github.com/hyperledger/fabric-samples/tree/main/high-throughput) farbic-samples. It makes it nearly impossible to encounter a MVCC CONFLICTs while using it. Please consult all these samples first if you want to contribute the chaincode.
+
+It basically manages 2 tokens, a standard ERC-20 token and a Soulbound one. While using `use` and `useFrom`, you turn your own ERC-20 token to the recipient's Soulbound one. The reason why it was designed like that is detailed in the powerpoint mentioned in Overview.
 
 #### Note
 All scripts in the `BISCE/directory` directory we use here are independent for the other parts of the project. That means you can use this to build your own Hyperledger Fabric network on multi-host.
@@ -260,9 +264,11 @@ Therefore, as mentioned before, **please do not use this in production purposes.
 ## Improvement
 The following is the improvements you may consider to contribute.
 
-* Add orderer bft consensus
+* Add [bft consensus that is about to be integrated into the Fabric ordering service for the v3.0 preview release](https://toc.hyperledger.org/project-reports/2023/2023-Q3-Hyperledger-Fabric.html)
 
 * Dockerize the frontend and backend
+
+  While the whole website requires many container operations, it's quite hard to run it as a independent container.
 
 * Debug
 
