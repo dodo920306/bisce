@@ -6,11 +6,11 @@
 
 This repository contains the source code of a web-based platform called "Blockchain-based Inventory of Scope-3 Carbon Emissions". The platform is designed to simulate carbon transactions between users on the Hyperledger Fabric blockchain. It has a React frontend and a Django backend and allows users to interact with an ERC-20 smart contract deployed on chain. 
 
-The website offers user authentication through JWT of Django Rest Framework, and then users can act as different identities on the blockchain with their own special ID as address and msp.
-
-This project is still under development, and we welcome any suggestions for improvement. You can help us identify issues by using the "Issues" tab above. Your feedback is valuable, and we appreciate your contribution to the project's development.
+This project is still under development, and we welcome any suggestions for improvement. Your feedback is valuable, and we appreciate your contribution to the project's development.
 
 If you want to understand more detail and also happen to be able to read in traditional Chinese, you can check out the powerpoint [here](https://docs.google.com/presentation/d/18R2ygUikURfjTdJtzM67ym33f1UPxzSckpC85smQbc0/edit?usp=sharing). Nevertheless, you can get most information about how to set up this project in the following description.
+
+[Video list about BISCE](https://youtube.com/playlist?list=PLuFrURqtW_6uIeKtf4eoqPLbVJGZwA10t&si=yDfMG0jmVk7g8FNJ)
 
 ## Environment
 The only environment used in experiments is Ubuntu 20.04. Any problem caused by trying to set this up in different environments is unknown.
