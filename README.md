@@ -35,15 +35,12 @@ The only environment used in experiments is Ubuntu 20.04. Any problem caused by 
     ```bash
     $ sudo apt-get update
     $ sudo apt-get install git curl docker-compose python3.9 python3.9-venv jq -y
+    $ sudo systemctl start docker
+    $ sudo usermod -a -G docker <username>
+    $ sudo systemctl enable docker
     ```
 
     Otherwise, you should check their docs to make sure how to install them in your system properly.
-
-    You can also use this to make sure the Docker daemon is running:
-
-    ```bash
-    $ sudo systemctl start docker
-    ```
 
 * [npm](https://github.com/nvm-sh/nvm)
 
