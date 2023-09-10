@@ -45,15 +45,13 @@ The only environment used in experiments is Ubuntu 20.04. Any problem caused by 
     $ sudo systemctl start docker
     ```
 
-* npm
-
-    You can get more information about how to install this in the [nvm github](https://github.com/nvm-sh/nvm) README.
+* [npm](https://github.com/nvm-sh/nvm)
 
     The npm version should not be too old, or it may cause bugs. (Specific version is unknown.)
 
-* tar
+* [tar](https://www.gnu.org/software/tar/)
 
-* go (optional)
+* [go](https://go.dev/doc/install)
 
 ## Installation
 1. Go to the directory you want to install this.
@@ -156,13 +154,13 @@ You may notice that a directory named `deliver` has been created under `BISCE/bl
 
 ```bash
 $ cd deliver
-$ chmod a+x inviteChannel.sh joinChannel.sh
+$ chmod +x inviteChannel.sh joinChannel.sh
 $ ./inviteChannel.sh
 ```
 
 to create the channel config that includes your organzations.
 
-After that, you may notice that there is a file named `update_in_envelope.pb` has been created, and you should give it to most of the organizations that are already in the channel.
+After that, you may notice that there is a file named `update_in_envelope.pb` has been created, and you should give it to a organization that is already in the channel.
 
 As a organization that is already in the channel, place the `update_in_envelope.pb` given by the joiners under `BISCE/blockchain` and use
 
@@ -177,6 +175,8 @@ $ sudo docker exec -e CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/users/admin/msp $
 ```
 
 to update the channel to include the joinners once you're sure that more than half of members in the channel has signed for it.
+
+**Note: the `peer channel signconfigtx` command signs the config *in place*, which means that a joiner can't just deliver the updated config to all member in the channel and ask them to sign it and update the channel. It must give the updated config to one single member in the channel first, ask it to sign it gently, and ask it to give the config it signed to the next member to sign, and so on. Every time a member has signed the config, the `update_in_envelope.pb` will be different from what it originally was as it carrys all the signatures inside itself. No one can update the channel until a member gets the config and is sure that it contains signatures of half of members.**
 
 Once the joiners are sure that they are in the channel, run
 
@@ -287,9 +287,11 @@ The following is the improvements you may consider to contribute.
 
 * Debug
 
+* Remove redundant code
+
 * Make the whole thing secure
 
-* Add hyperledger explorer
+* Add [hyperledger explorer](https://github.com/hyperledger-labs/blockchain-explorer)
 
 * Make multi-channel available
 
