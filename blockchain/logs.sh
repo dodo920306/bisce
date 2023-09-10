@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker-compose -f docker-compose.yaml -f docker-compose-ca.yaml logs -f
+sudo docker-compose -f docker-compose.yaml -f docker-compose-ca.yaml logs -f
