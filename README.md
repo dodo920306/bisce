@@ -8,7 +8,7 @@ This repository contains the source code of a web-based platform called "Blockch
 
 This project is still under development, and we welcome any suggestions for improvement. Your feedback is valuable, and we appreciate your contribution to the project's development.
 
-If you want to understand more detail and also happen to be able to read in traditional Chinese, you can check out the powerpoint [here](https://docs.google.com/presentation/d/18R2ygUikURfjTdJtzM67ym33f1UPxzSckpC85smQbc0/edit?usp=sharing). Nevertheless, you can get most information about how to set up this project in the following description.
+If you want to understand more detail and also happen to be able to read in traditional Chinese, you can check out the powerpoint [here](https://docs.google.com/presentation/d/18R2ygUikURfjTdJtzM67ym33f1UPxzSckpC85smQbc0/edit?usp=sharing). Nevertheless, you can get most of the information about how to set up this project in the following description.
 
 [Video list about BISCE](https://youtube.com/playlist?list=PLuFrURqtW_6uIeKtf4eoqPLbVJGZwA10t&si=yDfMG0jmVk7g8FNJ)
 
@@ -30,7 +30,7 @@ The only environment used in experiments is Ubuntu 20.04. Any problem caused by 
 
 * jq
 
-    You can install all of these by the following comments in ubuntu:
+    You can install all of these by the following comments on Ubuntu:
 
     ```bash
     $ sudo apt-get update
@@ -60,16 +60,16 @@ The only environment used in experiments is Ubuntu 20.04. Any problem caused by 
 
 Now you're ready to set this up.
 
-## Set up
+## Get Started
 As you might notice, the directory structure can be splitted into three main parts:
 
 1. blockchain
 1. backend
 1. frontend
 
-This is the exact order you should follow to build up the project. Any other order can cause unknown bugs.
+This is the exact order you should follow to build up the project. Consequences of any other order are unknown.
 
-Before we get into it, you should consider that you want to be a channel joiner or creater. That means the following steps will be different from your identity. Because currently the multi-channel network is not supported yet, your organization cannot be a channel joiner and creater at the same time.
+Before we get into it, you should consider that you want to be a channel joiner or creater. That is, the following steps will be different from your identity. Because currently the multi-channel network is not supported yet, your organization cannot be a channel joiner and creater at the same time.
 
 If you're a channel creater, I assume that you should be the network creater at the same time. That means you should bring up an overlay network with Docker Swarm. You should get your public network ip first and run
 
@@ -88,13 +88,13 @@ $ sudo docker swarm join-token manager
 
 and give the output instructions to them.
 
-If you're a joiner, follow the output from the above comment run by the creater, with your own public ip.
+If you're a joiner, follow the output from the above command run by the creater, with your own public ip.
 
 ```bash
 $ <output from join-token manager> --advertise-addr <your ip>
 ```
 
-### blockchain
+### Blockchain
 Go to the directory.
 
 ```bash
@@ -212,7 +212,7 @@ $ ./logs.sh
 
 If you encounter a tls problem, you may want to consult [this](https://stackoverflow.com/questions/76990991/tls-handshake-failed-with-error-eof-when-deploying-hyperledger-fabric-on-multi-h).
 
-### backend
+### Backend
 Once the blockchain has been set up, you may consider set up the backend next.
 
 Go to the directory.
@@ -245,7 +245,7 @@ Keep the shell process alive to keep it on, or you might consider use `screen` t
 
 You can open another shell to set up frontend next.
 
-### frontend
+### Frontend
 Go to the directory.
 
 ```bash
@@ -278,9 +278,11 @@ The following is the improvements you may consider to contribute.
 
 * Add [bft consensus that is about to be integrated into the Fabric ordering service for the v3.0 preview release](https://toc.hyperledger.org/project-reports/2023/2023-Q3-Hyperledger-Fabric.html)
 
-* Dockerize the frontend and backend
+* Dockerize the frontend
 
-  While the whole website requires many container operations, it's quite hard to run it as a independent container.
+* Upgrade the backend as a WSGI server. Also, make it a systemmd service.
+
+  I myself will choose gunicorn & nginx to do it.
 
 * Debug
 
