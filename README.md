@@ -1,5 +1,5 @@
-# BISCE
-![logo](https://user-images.githubusercontent.com/74814435/233967208-6be13513-f1dc-4246-9b19-5849ce11ce74.png)
+# BISCE: A simple, fast, and dynamic blockchain service deployment
+![logo](logo_white.png)
 
 ## Overview
 **Warning: Do not use this project in production purposes.**
@@ -277,8 +277,6 @@ Therefore, as mentioned before, **please do not use this in production purposes.
 The following is the improvements you may consider to contribute.
 
 * Add [bft consensus that is about to be integrated into the Fabric ordering service for the v3.0 preview release](https://toc.hyperledger.org/project-reports/2023/2023-Q3-Hyperledger-Fabric.html)
-
-* Dockerize the frontend
 
 * Upgrade the backend as a WSGI server. Also, make it a systemmd service.
 
