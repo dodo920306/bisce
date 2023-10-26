@@ -1,4 +1,4 @@
-# BISCE: A simple, fast, and dynamic blockchain service deployment
+# BISCE: A Simple, Fast, and Dynamic Blockchain Service Deployment Solution
 ![logo](logo_white.png)
 
 ## Overview
@@ -278,7 +278,7 @@ The following is the improvements you may consider to contribute.
 
 * Add [bft consensus that is about to be integrated into the Fabric ordering service for the v3.0 preview release](https://toc.hyperledger.org/project-reports/2023/2023-Q3-Hyperledger-Fabric.html)
 
-* Upgrade the backend as a WSGI server. Also, make it a systemmd service.
+* Upgrade the backend as a WSGI server. Also, make the website a systemmd service.
 
   I myself will choose gunicorn & nginx to do it.
 
