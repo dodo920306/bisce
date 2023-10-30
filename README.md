@@ -71,7 +71,7 @@ This is the exact order you should follow to build up the project. Consequences 
 
 Before we get into it, you should consider that you want to be a channel joiner or creater. That is, the following steps will be different from your identity. Because currently the multi-channel network is not supported yet, your organization cannot be a channel joiner and creater at the same time.
 
-If you're a channel creater, I assume that you should be the network creater at the same time. That means you should bring up an overlay network with Docker Swarm. You should get your public network ip first and run
+If you're a channel creater, I assume that you should be the network creater at the same time. That means you should bring up an overlay network with Docker Swarm. You should get your network ip first and run
 
 ```bash
 $ sudo docker swarm init --advertise-addr <your ip address>
@@ -88,7 +88,7 @@ $ sudo docker swarm join-token manager
 
 and give the output instructions to them.
 
-If you're a joiner, follow the output from the above command run by the creater, with your own public ip.
+If you're a joiner, follow the output from the above command run by the creater, with your own ip.
 
 ```bash
 $ <output from join-token manager> --advertise-addr <your ip>
@@ -139,7 +139,7 @@ The preferred way to invite third organization into the channel is use the secon
 
 The preferred way to invite forth organization into the channel is use the third member's deliver directory as a tarball after it joined the channel...and so on.
 
-As a joiner, once you get `deliver.tar.gz`, you should place it under your `BISCE/blockchain`.
+As a joiner, once you get `deliver.tar.gz`, you should place it under your `BISCE/blockchain` directory.
 
 Then run
 
@@ -147,7 +147,7 @@ Then run
 $ tar -zxvf deliver.tar.gz
 ```
 
-You may notice that a directory named `deliver` has been created under `BISCE/blockchain`. Run
+You may notice that a directory named `deliver` has been created under the `BISCE/blockchain` directory. Run
 
 ```bash
 $ cd deliver
@@ -159,7 +159,7 @@ to create the channel config that includes your organzations.
 
 After that, you may notice that there is a file named `update_in_envelope.pb` has been created, and you should give it to a organization that is already in the channel.
 
-As a organization that is already in the channel, place the `update_in_envelope.pb` given by the joiners under `BISCE/blockchain` and use
+As a organization that is already in the channel, place the `update_in_envelope.pb` given by the joiners under the `BISCE/blockchain` directory and use
 
 ```bash
 $ sudo docker exec -e CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/users/admin/msp $(sudo docker ps --filter "name=^peer0.*" --format "{{.Names}}") peer channel signconfigtx -f /etc/hyperledger/update_in_envelope.pb
@@ -190,7 +190,7 @@ $ cd ..
 $ tar -zcvf deliver.tar.gz deliver
 ```
 
-to make a tarball under `BISCE/blockchain` that you can deliver to next member who wants to join the channel. The original `deliver.tar.gz` won't make it because the config block in it isn't latest any more.
+to make a tarball under `BISCE/blockchain` that you can deliver to next member who wants to join the channel. The original `deliver.tar.gz` won't make it because the config block in it isn't latest anymore.
 
 #### The chaincode
 
