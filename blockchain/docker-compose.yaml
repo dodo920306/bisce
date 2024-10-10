@@ -1,13 +1,6 @@
-# Copyright IBM Corp. All Rights Reserved.
-#
-# SPDX-License-Identifier: Apache-2.0
-#
-
-version: '3.7'
-
-networks:
-  bisce-network:
-    external: true
+# networks:
+#   bisce-network:
+#     external: true
 
 volumes:
   orderer0:
@@ -16,8 +9,8 @@ volumes:
     external: true
 
 services:
-  orderer0.${HOST}:
-    container_name: orderer0.${HOST}
+  orderer:
+    container_name: orderer0
     image: hyperledger/fabric-orderer:latest
     env_file:
       - .env.orderer
@@ -27,25 +20,33 @@ services:
         - orderer0:/var/hyperledger/production/orderer
     working_dir: /root
     command: orderer
-    ports:
-      - 7050:7050
-      - 7053:7053
-      - 9443:9443
-    networks:
-      - bisce-network
+    # ports:
+    #   - 7050:7050
+    #   - 7053:7053
+    #   - 9443:9443
+    expose:
+        - 7050
+        - 7053
+        - 9443
+    # networks:
+    #   - bisce-network
+    network_mode: "host"
 
-  couchdb0.${HOST}:
-    container_name: couchdb0.${HOST}
+  couchdb:
+    container_name: couchdb0
     image: couchdb:3.3.2
     env_file:
       - .env.couchdb
-    ports:
-      - "5984:5984"
-    networks:
-      - bisce-network
+    # ports:
+    #   - "5984:5984"
+    expose:
+        - 5984
+    # networks:
+    #   - bisce-network
+    network_mode: "host"
 
-  peer0.${HOST}:
-    container_name: peer0.${HOST}
+  peer:
+    container_name: peer0
     image: hyperledger/fabric-peer:latest
     labels:
       service: hyperledger-fabric
@@ -57,10 +58,14 @@ services:
         - /var/run/docker.sock:/host/var/run/docker.sock
     working_dir: /root
     command: peer node start
-    ports:
-      - 7051:7051
-      - 9444:9444
+    # ports:
+    #   - 7051:7051
+    #   - 9444:9444
+    expose:
+        - 7051
+        - 9444
     depends_on:
-      - couchdb0.${HOST}
-    networks:
-      - bisce-network
+      - couchdb
+    # networks:
+    #   - bisce-network
+    network_mode: "host"

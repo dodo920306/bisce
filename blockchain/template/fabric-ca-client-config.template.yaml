@@ -1,0 +1,42 @@
+url: https://localhost:7054
+mspdir: msp
+tls:
+  certfiles:
+  client:
+    certfile:
+    keyfile:
+csr:
+  cn: caadmin
+  keyrequest:
+    algo: ecdsa
+    size: 256
+    reusekey: false
+  serialnumber:
+  names:
+    - C: US
+      ST: North Carolina
+      L:
+      O: ${ORG}
+      OU:
+  hosts:
+    - instance-1
+  ca:
+    expiry: 131400h
+id:
+  name:
+  type:
+  affiliation:
+  maxenrollments: 0
+  attributes:
+enrollment:
+  profile:
+  label:
+caname:
+bccsp:
+    default: SW
+    sw:
+        hash: SHA2
+        security: 256
+        filekeystore:
+            keystore: msp/keystore
+idemixCurveID: amcl.Fp256bn

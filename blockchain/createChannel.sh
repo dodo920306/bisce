@@ -19,33 +19,6 @@ CHANNEL=biscechannel1
 export FABRIC_CFG_PATH="${PWD}/config"
 set -x
 
-configtxgen -profile Bisce -outputBlock config_block.pb -channelID "${CHANNEL}"
-osnadmin channel join --channelID "${CHANNEL}" --config-block config_block.pb -o localhost:7053 --ca-file "${PWD}"/tlsca/tlsca-cert.pem --client-cert "${PWD}"/orderers/orderer0/tls/server.crt --client-key "${PWD}"/orderers/orderer0/tls/server.key
-osnadmin channel list -o localhost:7053 --ca-file "${PWD}"/tlsca/tlsca-cert.pem --client-cert "${PWD}"/orderers/orderer0/tls/server.crt --client-key "${PWD}"/orderers/orderer0/tls/server.key
-osnadmin channel list --channelID "${CHANNEL}" -o localhost:7053 --ca-file "${PWD}"/tlsca/tlsca-cert.pem --client-cert "${PWD}"/orderers/orderer0/tls/server.crt --client-key "${PWD}"/orderers/orderer0/tls/server.key
-sudo docker exec -e CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/users/admin/msp peer0.${HOST} peer channel join -b /etc/hyperledger/config_block.pb
-sudo docker exec peer0.${HOST} peer channel list
-echo "Channel creation Complete."
-
-printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-echo "Create Anchor Peer."
-configtxlator proto_decode --input "config_block.pb" --type common.Block --output "config_block.json"
-jq ".data.data[0].payload.data.config" "config_block.json" > config.json
-jq '.channel_group.groups.Application.groups.${ORG}.values += {"AnchorPeers":{"mod_policy": "Admins","value":{"anchor_peers": [{"host": "peer0.${HOST}","port": 7051}]},"version": "0"}}' config.json > modified_config.json
-configtxlator proto_encode --input config.json --type common.Config --output config.pb
-configtxlator proto_encode --input modified_config.json --type common.Config --output modified_config.pb
-configtxlator compute_update --channel_id "${CHANNEL}" --original config.pb --updated modified_config.pb --output config_update.pb
-configtxlator proto_decode --input config_update.pb --type common.ConfigUpdate --output config_update.json
-echo "{\"payload\":{\"header\":{\"channel_header\":{\"channel_id\":\"${CHANNEL}\", \"type\":2}},\"data\":{\"config_update\":$(cat config_update.json)}}}" | jq . > config_update_in_envelope.json
-configtxlator proto_encode --input config_update_in_envelope.json --type common.Envelope --output config_update_in_envelope.pb
-
-echo "Waiting here to prevent some weird bugs..."
-sleep 5
-sudo docker exec -e CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/users/admin/msp peer0.${HOST} peer channel update -f /etc/hyperledger/config_update_in_envelope.pb -c "${CHANNEL}" -o orderer0.${HOST}:7050 --tls --cafile /etc/hyperledger/peers/peer0/tls/ca.crt
-rm *.json
-rm *.pb
-echo "Anchor Peer creation Complete."
-
 echo "Waiting for chaincode to be installed. This could take for a while..."
 peer lifecycle chaincode package bisce.tar.gz --path $PWD/chaincode --lang golang --label bisce_1.0
 sudo docker exec -e CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/users/admin/msp peer0.${HOST} peer lifecycle chaincode install /etc/hyperledger/bisce.tar.gz

@@ -1,0 +1,130 @@
+Organizations:
+    - &${ORG}
+        Name: ${ORG}
+        ID: ${ORG}MSP
+        MSPDir: ${PWD}/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('${ORG}MSP.admin', '${ORG}MSP.peer', '${ORG}MSP.client','${ORG}MSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('${ORG}MSP.admin', '${ORG}MSP.client','${ORG}MSP.peer','${ORG}MSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('${ORG}MSP.admin','${ORG}MSP.peer')"
+            Endorsement:
+                Type: Signature
+                Rule: "OR('${ORG}MSP.peer')"
+        OrdererEndpoints:
+            - "${HOST}:7050"
+Capabilities:
+    Channel: &ChannelCapabilities
+        V2_0: true
+    Orderer: &OrdererCapabilities
+        V2_0: true
+    Application: &ApplicationCapabilities
+        V2_5: true
+Application: &ApplicationDefaults
+    ACLs: &ACLsDefault
+        _lifecycle/CheckCommitReadiness: /Channel/Application/Writers
+        _lifecycle/CommitChaincodeDefinition: /Channel/Application/Writers
+        _lifecycle/QueryChaincodeDefinition: /Channel/Application/Writers
+        _lifecycle/QueryChaincodeDefinitions: /Channel/Application/Writers
+        lscc/ChaincodeExists: /Channel/Application/Readers
+        lscc/GetDeploymentSpec: /Channel/Application/Readers
+        lscc/GetChaincodeData: /Channel/Application/Readers
+        lscc/GetInstantiatedChaincodes: /Channel/Application/Readers
+        qscc/GetChainInfo: /Channel/Application/Readers
+        qscc/GetBlockByNumber: /Channel/Application/Readers
+        qscc/GetBlockByHash: /Channel/Application/Readers
+        qscc/GetTransactionByID: /Channel/Application/Readers
+        qscc/GetBlockByTxID: /Channel/Application/Readers
+        cscc/GetConfigBlock: /Channel/Application/Readers
+        cscc/GetChannelConfig: /Channel/Application/Readers
+        peer/Propose: /Channel/Application/Writers
+        peer/ChaincodeToChaincode: /Channel/Application/Writers
+        event/Block: /Channel/Application/Readers
+        event/FilteredBlock: /Channel/Application/Readers
+    Organizations:
+    Policies: &ApplicationDefaultPolicies
+        LifecycleEndorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+        Endorsement:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Endorsement"
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+    Capabilities:
+        <<: *ApplicationCapabilities
+Orderer: &OrdererDefaults
+    OrdererType: etcdraft
+    Addresses:
+    BatchTimeout: 2s
+    BatchSize:
+        MaxMessageCount: 500
+        AbsoluteMaxBytes: 49 MB
+        PreferredMaxBytes: 512 KB
+    MaxChannels: 0
+    EtcdRaft:
+        Consenters:
+            - Host: ${HOST}
+              Port: 7050
+              ClientTLSCert: ../orderers/orderer0/tls/server.crt
+              ServerTLSCert: ../orderers/orderer0/tls/server.crt
+        Options:
+            TickInterval: 500ms
+            ElectionTick: 10
+            HeartbeatTick: 1
+            MaxInflightBlocks: 5
+            SnapshotIntervalSize: 16 MB
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+    Capabilities:
+        <<: *OrdererCapabilities
+Channel: &ChannelDefaults
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+    Capabilities:
+        <<: *ChannelCapabilities
+Profiles:
+    Bisce:
+        <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *${ORG}
+            Capabilities: *OrdererCapabilities
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *${ORG}
+            Capabilities: *ApplicationCapabilities
