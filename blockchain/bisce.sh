@@ -303,15 +303,28 @@ createChannel()
     envsubst '${ORG} ${HOST} ${CHANNEL}' \
         < template/config_update_in_envelope.template.json \
         > config_update_in_envelope.json
-    configtxlator proto_encode --input config_update_in_envelope.json --type common.Envelope --output config_update_in_envelope.pb
+    configtxlator proto_encode \
+        --input config_update_in_envelope.json \
+        --type common.Envelope \
+        --output config_update_in_envelope.pb
     rm config_update_in_envelope.json
     # wait for peer leader election
     sleep 5
-    peer channel update -f config_update_in_envelope.pb -c "${CHANNEL}" -o "${HOST}:7050" --tls --cafile "${PWD}/peers/peer0/tls/ca.crt"
+    peer channel update \
+        -f config_update_in_envelope.pb \
+        -c "${CHANNEL}" \
+        -o "${HOST}:7050" \
+        --tls \
+        --cafile "${PWD}/peers/peer0/tls/ca.crt"
     if [ $? -ne 0 ]; then
         echo "Update config failed, retrying in 5 seconds..."
         sleep 5
-        peer channel update -f config_update_in_envelope.pb -c "${CHANNEL}" -o "${HOST}:7050" --tls --cafile "${PWD}/peers/peer0/tls/ca.crt"
+        peer channel update \
+            -f config_update_in_envelope.pb \
+            -c "${CHANNEL}" \
+            -o "${HOST}:7050" \
+            --tls \
+            --cafile "${PWD}/peers/peer0/tls/ca.crt"
         if [ $? -ne 0 ]; then
             echo "Update config failed again, exiting."
             exit -5
@@ -320,25 +333,48 @@ createChannel()
     rm config_update_in_envelope.pb
     mkdir -p channels/${CHANNEL}/orgRequest
     mkdir channels/${CHANNEL}/proposal
+
     echo "Creation of the channel completed."
 }
 
-generateProposal()
+applyForJoiningChannel()
 {
-    peer channel fetch config config_block.pb -o localhost:7050 -c ${CHANNEL} --tls --cafile "${PWD}/orderers/orderer0/tls/ca.crt"
-    configtxlator proto_decode --input config_block.pb --type common.Block --output config_block.json
-    jq ".data.data[0].payload.data.config" config_block.json > config.json
-    jq -s '.[0] * {"channel_group":{"groups":{"Application":{"groups": {"${ORG}":.[1]}}}}}' config.json channels/${CHANNEL}/orgRequest/${ORG}.json > modified_config.json
-    configtxlator proto_encode --input config.json --type common.Config --output config.pb
-    configtxlator compute_update --channel_id ${CHANNEL} --original config.pb --updated modified_config.pb --output update.pb
-    configtxlator proto_decode --input update.pb --type common.ConfigUpdate --output update.json
-    echo '{"payload":{"header":{"channel_header":{"channel_id":"'${CHANNEL}'", "type":2}},"data":{"config_update":'$(cat update.json)'}}}' | jq . > update_in_envelope.json
-    configtxlator proto_encode --input update_in_envelope.json --type common.Envelope --output channels/${CHANNEL}/proposals/update_in_envelope.pb
+    echo "Application for joining the channel starts."
+    mkdir channels/${CHANNEL}/orgRequests/${ORG}
+    touch channels/${CHANNEL}/orgRequests/${ORG}/.env
+    echo "HOST=${HOST}" > channels/${CHANNEL}/orgRequests/${ORG}/.env
+    echo "CERT=$(base64 orderers/orderer0/tls/server.crt | tr -d '\n')" >> channels/${CHANNEL}/orgRequests/${ORG}/.env
+    configtxgen -printOrg ${ORG} > ${ORG}.json
+    mv ${ORG}.json channels/${CHANNEL}/orgRequests/${ORG}/${ORG}.json
+    echo "Application for joining the channel completed."
 }
 
-signProposal()
+joinChannel()
 {
-    peer channel signconfigtx -f channels/${CHANNEL}/proposals/update_in_envelope.pb
+    osnadmin channel join \
+        --channelID ${CHANNEL} \
+        --config-block "channels/${CHANNEL}/${CHANNEL}.block" \
+        -o "${HOST}:7053" \
+        --ca-file tlsca/tlsca-cert.pem \
+        --client-cert orderers/orderer0/tls/server.crt \
+        --client-key orderers/orderer0/tls/server.key
+    peer channel join -b "channels/${CHANNEL}/${CHANNEL}.block"
+}
+
+listChannel()
+{
+    osnadmin channel list \
+        -o "${HOST}:7053" \
+        --ca-file tlsca/tlsca-cert.pem \
+        --client-cert orderers/orderer0/tls/server.crt \
+        --client-key orderers/orderer0/tls/server.key
+    osnadmin channel list \
+        --channelID ${CHANNEL} \
+        -o "${HOST}:7053" \
+        --ca-file tlsca/tlsca-cert.pem \
+        --client-cert orderers/orderer0/tls/server.crt \
+        --client-key orderers/orderer0/tls/server.key
+    peer channel list
 }
 
 if [[ $# -lt 1 ]] ; then
@@ -366,6 +402,15 @@ case "$MODE" in
         ;;
     createChannel )
         createChannel
+        ;;
+    applyForJoiningChannel )
+        applyForJoiningChannel
+        ;;
+    joinChannel )
+        joinChannel
+        ;;
+    listChannel )
+        listChannel
         ;;
     * )
         echo "Error: no such action" >&2
