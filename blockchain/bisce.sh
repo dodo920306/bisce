@@ -64,6 +64,34 @@ loooooooooooooooooo    ...    'oooooooooooooooooo;
         if [[ ! $ORG =~ ^[a-zA-Z0-9]+$ ]]; then
             echo "Error: The value of 'ORG' shouldn't include characters that are not letters and numbers." >&2
             exit -2
+        fi
+    elif [[ "$confirm" == "n" ]]; then
+        echo "Initialization Cancelled by the user."
+        exit 0
+    else
+        echo "Error: Unknown Error" >&2
+        exit -3
+    fi
+
+    if [[ -n "${HOST}" ]]; then
+        echo -e "The hostname of your BISCE is \e[1;31m${HOST}\e[0m."
+        while true; do
+            read -p "Can you confirm that this is correct? (Y/n) " confirm
+            if [[ "$confirm" == "Y" || "$confirm" == "n" ]]; then
+                break
+            else
+                echo "Invalid input. Please enter 'Y' or 'n'." >&2
+            fi
+        done
+    else
+        echo "Error: environment variable 'HOST' doesn't have a value." >&2
+        exit -1
+    fi
+    
+    if [[ "$confirm" == "Y" ]]; then
+        if [[ ! $ORG =~ ^[a-zA-Z0-9.]+$ ]]; then
+            echo "Error: The value of 'HOST' shouldn't include characters that are not letters, dots, and numbers." >&2
+            exit -2
         else
             echo "Welcome ${ORG}!"
         fi
@@ -102,19 +130,19 @@ setup()
     echo "Setup starts."
 
     docker compose -f docker-compose-ca.yaml up -d
-
-    while true; do
+    sleep 5
+    HTTP_STATUS=$(curl -X GET -s -o /dev/null -w "%{http_code}" http://localhost:17054/healthz)
+    if [ "$HTTP_STATUS" -ne 200 ]; then
+        echo "Fabric CA Server is not healthy (HTTP $HTTP_STATUS). Retrying in 5 seconds..."
+        sleep 5
         HTTP_STATUS=$(curl -X GET -s -o /dev/null -w "%{http_code}" http://localhost:17054/healthz)
-
-        if [ "$HTTP_STATUS" -eq 200 ]; then
-            echo "Fabric CA Server is healthy (HTTP 200)"
-            break
-        else
-            echo "Fabric CA Server is not healthy (HTTP $HTTP_STATUS). Retrying in 5 seconds..."
-            sleep 5
+        if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Fabric CA Server is unhealthy, exiting."
+            exit -6
         fi
-    done
+    fi
 
+    echo "Fabric CA Server is healthy."
     echo "create Fabric CA Client user"
     if ! fabric-ca-client identity list --id caadmin --tls.certfiles fabric-ca/ca-cert.pem 1>/dev/null 2>/dev/null; then
         fabric-ca-client enroll \
@@ -261,25 +289,56 @@ createChannel()
 {
     echo "Creation of the channel starts."
     configtxgen -profile Bisce -outputBlock config_block.pb -channelID "${CHANNEL}"
-    configtxlator proto_decode --input config_block.pb --type common.Block --output config_block.json
-    rm config_block.pb
-    jq \
-        ".data.data[0].payload.data.config.channel_group.groups.Application.groups."${ORG}".values += {\"AnchorPeers\":{\"mod_policy\": \"Admins\",\"value\":{\"anchor_peers\": [{\"host\": \"${HOST}\",\"port\": 7051}]},\"version\": \"0\"}}" \
-        config_block.json > config.json
-    rm config_block.json
-    configtxlator proto_encode --input config.json --type common.Block --output config.pb
-    rm config.json
     osnadmin channel join \
         --channelID "${CHANNEL}" \
         --config-block config_block.pb \
-        -o localhost:7053 \
+        -o "${HOST}:7053" \
         --ca-file tlsca/tlsca-cert.pem \
         --client-cert orderers/orderer0/tls/server.crt \
         --client-key orderers/orderer0/tls/server.key
     peer channel join \
         -b config_block.pb
     rm config_block.pb
+
+    envsubst '${ORG} ${HOST} ${CHANNEL}' \
+        < template/config_update_in_envelope.template.json \
+        > config_update_in_envelope.json
+    configtxlator proto_encode --input config_update_in_envelope.json --type common.Envelope --output config_update_in_envelope.pb
+    rm config_update_in_envelope.json
+    # wait for peer leader election
+    sleep 5
+    peer channel update -f config_update_in_envelope.pb -c "${CHANNEL}" -o "${HOST}:7050" --tls --cafile "${PWD}/peers/peer0/tls/ca.crt"
+    if [ $? -ne 0 ]; then
+        echo "Update config failed, retrying in 5 seconds..."
+        sleep 5
+        peer channel update -f config_update_in_envelope.pb -c "${CHANNEL}" -o "${HOST}:7050" --tls --cafile "${PWD}/peers/peer0/tls/ca.crt"
+        if [ $? -ne 0 ]; then
+            echo "Update config failed again, exiting."
+            exit -5
+        fi
+    fi
+    rm config_update_in_envelope.pb
+    mkdir -p channels/${CHANNEL}/orgRequest
+    mkdir channels/${CHANNEL}/proposal
     echo "Creation of the channel completed."
+}
+
+generateProposal()
+{
+    peer channel fetch config config_block.pb -o localhost:7050 -c ${CHANNEL} --tls --cafile "${PWD}/orderers/orderer0/tls/ca.crt"
+    configtxlator proto_decode --input config_block.pb --type common.Block --output config_block.json
+    jq ".data.data[0].payload.data.config" config_block.json > config.json
+    jq -s '.[0] * {"channel_group":{"groups":{"Application":{"groups": {"${ORG}":.[1]}}}}}' config.json channels/${CHANNEL}/orgRequest/${ORG}.json > modified_config.json
+    configtxlator proto_encode --input config.json --type common.Config --output config.pb
+    configtxlator compute_update --channel_id ${CHANNEL} --original config.pb --updated modified_config.pb --output update.pb
+    configtxlator proto_decode --input update.pb --type common.ConfigUpdate --output update.json
+    echo '{"payload":{"header":{"channel_header":{"channel_id":"'${CHANNEL}'", "type":2}},"data":{"config_update":'$(cat update.json)'}}}' | jq . > update_in_envelope.json
+    configtxlator proto_encode --input update_in_envelope.json --type common.Envelope --output channels/${CHANNEL}/proposals/update_in_envelope.pb
+}
+
+signProposal()
+{
+    peer channel signconfigtx -f channels/${CHANNEL}/proposals/update_in_envelope.pb
 }
 
 if [[ $# -lt 1 ]] ; then

@@ -1,2 +1,13 @@
 backend/env
 backend/backend/__pycache__
+blockchain/ca
+blockchain/config
+blockchain/fabric-ca
+blockchain/msp
+blockchain/peers
+blockchain/orderers
+blockchain/tlsca
+blockchain/users
+blockchain/fabric
+blockchain/channels
+blockchain/fabric-ca-client-config.yaml
