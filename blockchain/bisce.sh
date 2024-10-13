@@ -276,7 +276,20 @@ reset()
 uninit()
 {
     echo "Uninit starts"
-    sudo rm -rf fabric-ca/ peercfg/ msp/ ca/ tlsca/ users/ orderers/ bin/ builders/ config/ peers/ fabric/ deliver/
+    sudo rm -rf \
+        fabric-ca/ \
+        peercfg/ \
+        msp/ \
+        ca/ \
+        tlsca/ \
+        users/ \
+        orderers/ \
+        bin/ \
+        builders/ \
+        config/ \
+        peers/ \
+        fabric/ \
+        channels/
     docker compose -f docker-compose-ca.yaml down
     docker compose -f docker-compose.yaml down
     docker volume rm peer0
@@ -303,42 +316,133 @@ createChannel()
     envsubst '${ORG} ${HOST} ${CHANNEL}' \
         < template/config_update_in_envelope.template.json \
         > config_update_in_envelope.json
-    configtxlator proto_encode --input config_update_in_envelope.json --type common.Envelope --output config_update_in_envelope.pb
+    configtxlator proto_encode \
+        --input config_update_in_envelope.json \
+        --type common.Envelope \
+        --output config_update_in_envelope.pb
     rm config_update_in_envelope.json
     # wait for peer leader election
     sleep 5
-    peer channel update -f config_update_in_envelope.pb -c "${CHANNEL}" -o "${HOST}:7050" --tls --cafile "${PWD}/peers/peer0/tls/ca.crt"
+    peer channel update \
+        -f config_update_in_envelope.pb \
+        -c "${CHANNEL}" \
+        -o "${HOST}:7050" \
+        --tls \
+        --cafile "${PWD}/peers/peer0/tls/ca.crt"
     if [ $? -ne 0 ]; then
         echo "Update config failed, retrying in 5 seconds..."
         sleep 5
-        peer channel update -f config_update_in_envelope.pb -c "${CHANNEL}" -o "${HOST}:7050" --tls --cafile "${PWD}/peers/peer0/tls/ca.crt"
+        peer channel update \
+            -f config_update_in_envelope.pb \
+            -c "${CHANNEL}" \
+            -o "${HOST}:7050" \
+            --tls \
+            --cafile "${PWD}/peers/peer0/tls/ca.crt"
         if [ $? -ne 0 ]; then
             echo "Update config failed again, exiting."
             exit -5
         fi
     fi
     rm config_update_in_envelope.pb
-    mkdir -p channels/${CHANNEL}/orgRequest
-    mkdir channels/${CHANNEL}/proposal
+    mkdir -p channels/${CHANNEL}/orgRequests
+    mkdir channels/${CHANNEL}/proposals
+    peer channel fetch 0 \
+        "channels/${CHANNEL}/${CHANNEL}.block" \
+        -o "${HOST}:7050" \
+        -c "${CHANNEL}" \
+        -o "${HOST}:7050" \
+        --tls \
+        --cafile "${PWD}/peers/peer0/tls/ca.crt"
     echo "Creation of the channel completed."
 }
 
 generateProposal()
 {
-    peer channel fetch config config_block.pb -o localhost:7050 -c ${CHANNEL} --tls --cafile "${PWD}/orderers/orderer0/tls/ca.crt"
-    configtxlator proto_decode --input config_block.pb --type common.Block --output config_block.json
-    jq ".data.data[0].payload.data.config" config_block.json > config.json
-    jq -s '.[0] * {"channel_group":{"groups":{"Application":{"groups": {"${ORG}":.[1]}}}}}' config.json channels/${CHANNEL}/orgRequest/${ORG}.json > modified_config.json
-    configtxlator proto_encode --input config.json --type common.Config --output config.pb
-    configtxlator compute_update --channel_id ${CHANNEL} --original config.pb --updated modified_config.pb --output update.pb
-    configtxlator proto_decode --input update.pb --type common.ConfigUpdate --output update.json
-    echo '{"payload":{"header":{"channel_header":{"channel_id":"'${CHANNEL}'", "type":2}},"data":{"config_update":'$(cat update.json)'}}}' | jq . > update_in_envelope.json
-    configtxlator proto_encode --input update_in_envelope.json --type common.Envelope --output channels/${CHANNEL}/proposals/update_in_envelope.pb
+    peer channel fetch config config_block.pb \
+        -o localhost:7050 \
+        -c ${CHANNEL} \
+        --tls \
+        --cafile "${PWD}/orderers/orderer0/tls/ca.crt"
+    set -a
+    source channels/${CHANNEL}/orgRequests/$1/.env
+    set +a
+    echo "Proposal generation for $1 starts."
+    configtxlator proto_decode \
+        --input config_block.pb \
+        --type common.Block \
+        --output config_block.json
+    rm config_block.pb
+    jq ".data.data[0].payload.data.config" config_block.json \
+        > config.json
+    rm config_block.json
+    jq -s \
+        ".[0] * {\"channel_group\":{\"groups\":{\"Application\":{\"groups\": {\"$1\":.[1]}}}}}" \
+        config.json "channels/${CHANNEL}/orgRequests/$1/$1.json" \
+        > tmp1.json
+    jq "del(.channel_group.groups.Application.groups.$1.values.Endpoints)" \
+        tmp1.json \
+        > tmp2.json
+    rm tmp1.json
+    jq ".channel_group.groups.Application.groups.$1.values += {\"AnchorPeers\":{\"mod_policy\": \"Admins\",\"value\":{\"anchor_peers\": [{\"host\": \"${HOST}\",\"port\": 7051}]},\"version\": \"0\"}}" \
+        tmp2.json \
+        > tmp3.json
+    rm tmp2.json
+    jq -s \
+        ".[0] * {\"channel_group\":{\"groups\":{\"Orderer\":{\"groups\": {\"$1\":.[1]}}}}}" \
+        tmp3.json "channels/${CHANNEL}/orgRequests/$1/$1.json" \
+        > tmp4.json
+    rm tmp3.json
+    jq ".channel_group.groups.Orderer.values.ConsensusType.value.metadata.consenters += [{\"client_tls_cert\": \"${CERT}\", \"host\": \"${HOST}\", \"port\": 7050, \"server_tls_cert\": \"${CERT}\"}]" \
+        tmp4.json \
+        > modified_config.json
+    rm tmp4.json
+    configtxlator proto_encode \
+        --input config.json \
+        --type common.Config \
+        --output config.pb
+    rm config.json
+    configtxlator proto_encode \
+        --input modified_config.json \
+        --type common.Config \
+        --output modified_config.pb
+    rm modified_config.json
+    configtxlator compute_update \
+        --channel_id ${CHANNEL} \
+        --original config.pb \
+        --updated modified_config.pb \
+        --output update.pb
+    rm config.pb
+    rm modified_config.pb 
+    configtxlator proto_decode \
+        --input update.pb \
+        --type common.ConfigUpdate \
+        --output update.json
+    rm update.pb
+    echo '{"payload":{"header":{"channel_header":{"channel_id":"'${CHANNEL}'", "type":2}},"data":{"config_update":'$(cat update.json)'}}}' \
+        | jq . > update_in_envelope.json
+    rm update.json
+    configtxlator proto_encode \
+        --input update_in_envelope.json \
+        --type common.Envelope \
+        --output channels/${CHANNEL}/proposals/$1.pb
+    rm update_in_envelope.json
+    rm -rf channels/${CHANNEL}/orgRequests/$1
+    echo "Proposal generation for $1 completed."
 }
 
 signProposal()
 {
-    peer channel signconfigtx -f channels/${CHANNEL}/proposals/update_in_envelope.pb
+    peer channel signconfigtx -f "channels/${CHANNEL}/proposals/$1.pb"
+}
+
+commitProposal()
+{
+    peer channel update \
+        -f "channels/${CHANNEL}/proposals/$1.pb" \
+        -c "${CHANNEL}" \
+        -o "${HOST}:7050" \
+        --tls \
+        --cafile "${PWD}/peers/peer0/tls/ca.crt"
 }
 
 if [[ $# -lt 1 ]] ; then
@@ -366,6 +470,15 @@ case "$MODE" in
         ;;
     createChannel )
         createChannel
+        ;;
+    generateProposal )
+        generateProposal $@
+        ;;
+    signProposal )
+        signProposal $@
+        ;;
+    commitProposal )
+        commitProposal $@
         ;;
     * )
         echo "Error: no such action" >&2
